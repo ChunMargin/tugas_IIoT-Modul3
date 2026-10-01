@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "author": "Noe Ginting",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-c3-devkitm-1", "id": "esp", "top": 18.9, "left": 25.02, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": 79.8, "left": 258.3, "rotate": 90, "attrs": {} },
+    {
+      "type": "board-bmp180",
+      "id": "bmp1",
+      "top": -62.04,
+      "left": 190.94,
+      "rotate": 180,
+      "attrs": {}
+    },
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": -68.5, "left": -86.6, "attrs": {} },
+    {
+      "type": "wokwi-slide-switch",
+      "id": "sw1",
+      "top": 30.4,
+      "left": 211.7,
+      "rotate": 90,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "sw1:2", "esp:8", "green", [ "h-28.8", "v38.5" ] ],
+    [ "dht1:SDA", "esp:4", "green", [ "v0" ] ],
+    [ "pot1:SIG", "esp:1", "green", [ "v0" ] ],
+    [ "bmp1:SCL", "esp:TX", "green", [ "h-57.6", "v86.21" ] ],
+    [ "pot1:GND", "esp:GND.4", "black", [ "v0" ] ],
+    [ "esp:3V3.1", "pot1:VCC", "green", [ "h0" ] ],
+    [ "esp:RX", "bmp1:SDA", "green", [ "h37.12", "v-105.6" ] ],
+    [ "bmp1:VCC", "esp:3V3.1", "red", [ "h-182.4", "v57.6" ] ],
+    [ "bmp1:GND", "esp:GND.1", "black", [ "h0" ] ],
+    [ "sw1:1", "esp:GND.10", "green", [ "v0" ] ],
+    [ "sw1:3", "esp:3V3.2", "green", [ "h0" ] ],
+    [ "dht1:VCC", "esp:3V3.2", "red", [ "h-220.8", "v-67.2" ] ],
+    [ "dht1:GND", "esp:GND.6", "black", [ "v19.2", "h-113.92" ] ]
+  ],
+  "dependencies": {}
+}

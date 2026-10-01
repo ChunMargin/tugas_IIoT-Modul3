@@ -14,6 +14,7 @@ DHT dht(DHT_PIN, DHT_TYPE);
 void setup() {
   Serial.begin(115200);
   delay(1000);
+  Serial.println("ESP32 Started!");
 
   pinMode(SWITCH_PIN, INPUT_PULLDOWN);
   analogReadResolution(12);
@@ -32,11 +33,15 @@ void setup() {
 void loop() {
   static unsigned long lastPrint = 1000;
   const unsigned long interval = 1000;
+  const unsigned long timestamp = millis();
 
-  if (millis() - lastPrint >= interval) {
-    lastPrint = millis();
+  if (timestamp - lastPrint >= interval) {
+    lastPrint = timestamp;
 
     Serial.println("=== NODE AKUISISI IIoT ===");
+    Serial.print("Timestamp: ");
+    Serial.print(timestamp);
+    Serial.println(" ms");
 
     const int spdtState = digitalRead(SWITCH_PIN);
     const int raw = analogRead(POT_PIN);
@@ -53,6 +58,18 @@ void loop() {
     Serial.print(" | Tegangan pendekatan: ");
     Serial.print(voltage, 3);
     Serial.println(" V");
+
+    String potLevel;
+    if (raw <= 1365) {
+      potLevel = "LOW";
+    } else if (raw <= 2730) {
+      potLevel = "MEDIUM";
+    } else {
+      potLevel = "HIGH";
+    }
+    
+    Serial.print("Simulasi Level: ");
+    Serial.println(potLevel);
 
     if (isnan(lux)) {
       Serial.println("BH1750 gagal membaca cahaya.");
@@ -72,7 +89,18 @@ void loop() {
       Serial.println("°C");
     }
 
+    if (!isnan(temperature) && !isnan(lux)) {       // Memastikan bacaan suhu dan lux valid (bukan NaN) sebelum mengeksekusi logika alarm
+      if (temperature > 30.0f || lux < 50.0f) {     // Mengecek kondisi alarm: apakah suhu lebih dari 30 °C ATAU lux kurang dari 50 lx
+        Serial.println("[PERINGATAN ALARM]"); // Mencetak pesan peringatan utama jika salah satu kondisi terpenuhi
+        if (temperature > 30.0f) {                  // Mengecek spesifik apakah pemicu alarm berasal dari suhu tinggi
+          Serial.println(" -> P (> 30 °C)");   // Mencetak detail penyebab peringatan suhu tinggi
+        }                                           // Menutup blok pengecekan kondisi suhu
+        if (lux < 50.0f) {                          // Mengecek spesifik apakah pemicu alarm berasal dari intensitas cahaya rendah
+          Serial.println(" -> L (< 50 lx)");  // Mencetak detail penyebab peringatan cahaya redup
+        }                                           // Menutup blok pengecekan kondisi lux
+      }                                             // Menutup blok eksekusi peringatan alarm
+    }                                               // Menutup blok validasi data sensor
+
     Serial.println("----------------------------------------");
   }
-
 }
